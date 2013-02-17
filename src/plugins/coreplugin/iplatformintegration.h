@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2013 Daniel Molkentin, Mirko Boehm.
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -27,42 +27,28 @@
 **
 ****************************************************************************/
 
-#include <coreplugin/iplatformintegration.h>
-#include <extensionsystem/pluginmanager.h>
+#ifndef IPLATFORMINTEGRATION_H
+#define IPLATFORMINTEGRATION_H
 
-#include "progressmanager_p.h"
+#include <QObject>
 
-static inline QList<Core::IPlatformIntegration*> allPlatformIntegrations()
+#include "core_global.h"
+
+namespace Core {
+
+class CORE_EXPORT IPlatformIntegration : public QObject
 {
-    return ExtensionSystem::PluginManager::getObjects<Core::IPlatformIntegration>();
-}
+    Q_OBJECT
+public:
+    explicit IPlatformIntegration(QObject *parent = 0);
 
-void Core::Internal::ProgressManagerPrivate::initInternal()
-{
+    virtual void setApplicationLabel(const QString &text) = 0;
+    virtual void setApplicationProgressRange(int min, int max) = 0;
+    virtual void setApplicationProgressValue(int value) = 0;
+    virtual void setApplicationProgressVisible(bool visible) = 0;
 
-}
+};
 
-void Core::Internal::ProgressManagerPrivate::cleanup()
-{
-}
+} // namespace Core
 
-void Core::Internal::ProgressManagerPrivate::doSetApplicationLabel(const QString &text)
-{
-    Q_UNUSED(text)
-}
-
-void Core::Internal::ProgressManagerPrivate::setApplicationProgressRange(int min, int max)
-{
-    Q_UNUSED(min)
-    Q_UNUSED(max)
-}
-
-void Core::Internal::ProgressManagerPrivate::setApplicationProgressValue(int value)
-{
-    Q_UNUSED(value)
-}
-
-void Core::Internal::ProgressManagerPrivate::setApplicationProgressVisible(bool visible)
-{
-    Q_UNUSED(visible)
-}
+#endif // IPLATFORMINTEGRATION_H

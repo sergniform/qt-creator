@@ -97,6 +97,7 @@ SOURCES += mainwindow.cpp \
     iversioncontrol.cpp \
     dialogs/addtovcsdialog.cpp \
     icorelistener.cpp \
+    iplatformintegration.cpp \
     ioutputpane.cpp
 
 HEADERS += mainwindow.h \
@@ -195,6 +196,7 @@ HEADERS += mainwindow.h \
     documentmanager.h \
     removefiledialog.h \
     dialogs/addtovcsdialog.h
+    iplatformintegration.h
 
 FORMS += dialogs/newdialog.ui \
     dialogs/saveitemsdialog.ui \

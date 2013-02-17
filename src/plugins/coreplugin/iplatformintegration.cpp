@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2013 Daniel Molkentin, Mirko Boehm.
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -27,42 +27,13 @@
 **
 ****************************************************************************/
 
-#include <coreplugin/iplatformintegration.h>
-#include <extensionsystem/pluginmanager.h>
+#include "iplatformintegration.h"
 
-#include "progressmanager_p.h"
+namespace Core {
 
-static inline QList<Core::IPlatformIntegration*> allPlatformIntegrations()
-{
-    return ExtensionSystem::PluginManager::getObjects<Core::IPlatformIntegration>();
-}
-
-void Core::Internal::ProgressManagerPrivate::initInternal()
-{
-
-}
-
-void Core::Internal::ProgressManagerPrivate::cleanup()
+IPlatformIntegration::IPlatformIntegration(QObject *parent) :
+    QObject(parent)
 {
 }
 
-void Core::Internal::ProgressManagerPrivate::doSetApplicationLabel(const QString &text)
-{
-    Q_UNUSED(text)
-}
-
-void Core::Internal::ProgressManagerPrivate::setApplicationProgressRange(int min, int max)
-{
-    Q_UNUSED(min)
-    Q_UNUSED(max)
-}
-
-void Core::Internal::ProgressManagerPrivate::setApplicationProgressValue(int value)
-{
-    Q_UNUSED(value)
-}
-
-void Core::Internal::ProgressManagerPrivate::setApplicationProgressVisible(bool visible)
-{
-    Q_UNUSED(visible)
-}
+} // namespace Core;
