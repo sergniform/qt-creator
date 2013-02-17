@@ -39,30 +39,34 @@ static inline QList<Core::IPlatformIntegration*> allPlatformIntegrations()
 
 void Core::Internal::ProgressManagerPrivate::initInternal()
 {
-
+    // intentionally left blank
 }
 
 void Core::Internal::ProgressManagerPrivate::cleanup()
 {
+    // intentionally left blank
 }
 
 void Core::Internal::ProgressManagerPrivate::doSetApplicationLabel(const QString &text)
 {
-    Q_UNUSED(text)
+    foreach(IPlatformIntegration *platform, allPlatformIntegrations())
+        platform->setApplicationLabel(text);
 }
 
 void Core::Internal::ProgressManagerPrivate::setApplicationProgressRange(int min, int max)
 {
-    Q_UNUSED(min)
-    Q_UNUSED(max)
+    foreach(IPlatformIntegration *platform, allPlatformIntegrations())
+        platform->setApplicationProgressRange(min, max);
 }
 
 void Core::Internal::ProgressManagerPrivate::setApplicationProgressValue(int value)
 {
-    Q_UNUSED(value)
+    foreach(IPlatformIntegration *platform, allPlatformIntegrations())
+        platform->setApplicationProgressValue(value);
 }
 
 void Core::Internal::ProgressManagerPrivate::setApplicationProgressVisible(bool visible)
 {
-    Q_UNUSED(visible)
+    foreach(IPlatformIntegration *platform, allPlatformIntegrations())
+        platform->setApplicationProgressVisible(visible);
 }
