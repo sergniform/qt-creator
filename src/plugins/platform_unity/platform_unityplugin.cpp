@@ -89,6 +89,8 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
     Q_UNUSED(arguments)
     Q_UNUSED(errorMessage)
 
+    addObject(this);
+
     void* unity_lib = dlopen("libunity.so.4", RTLD_LAZY);
     if (!unity_lib)
         unity_lib = dlopen("libunity.so.6", RTLD_LAZY);
