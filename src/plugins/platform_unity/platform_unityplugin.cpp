@@ -47,7 +47,7 @@
 #include <extensionsystem/pluginmanager.h>
 
 namespace {
-    static const char *QTCREATOR_DESKTOP_FILE = "qt-creator.desktop";
+    static const char *QTCREATOR_DESKTOP_FILE = "qtcreator.desktop";
     int total_progress = 0;
 
     // Unity data typedefs
