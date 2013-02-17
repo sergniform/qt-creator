@@ -30,12 +30,12 @@
 #ifndef PLATFORM_UNITY_PLUGIN_H
 #define PLATFORM_UNITY_PLUGIN_H
 
-#include <extensionsystem/iplugin.h>
+#include <coreplugin/iplatformintegration.h>
 
 namespace PlatformUnity {
 namespace Internal {
 
-class PlatformUnityPlugin : public ExtensionSystem::IPlugin
+class PlatformUnityPlugin : public Core::IPlatformIntegration
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QtCreatorPlugin" FILE "PlatformUnity.json")
@@ -47,6 +47,12 @@ public:
     bool initialize(const QStringList &arguments, QString *errorMessage);
 
     void extensionsInitialized();
+
+    //implement Core::IPlatformIntegration
+    void setApplicationLabel(const QString &text);
+    void setApplicationProgressRange(int min, int max);
+    void setApplicationProgressValue(int value);
+    void setApplicationProgressVisible(bool visible);
 };
 
 } // namespace Internal

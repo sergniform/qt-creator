@@ -33,20 +33,20 @@
 #include <QObject>
 
 #include "core_global.h"
+#include <extensionsystem/iplugin.h>
 
 namespace Core {
 
-class CORE_EXPORT IPlatformIntegration : public QObject
+class CORE_EXPORT IPlatformIntegration : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
 public:
-    explicit IPlatformIntegration(QObject *parent = 0);
+    IPlatformIntegration();
 
     virtual void setApplicationLabel(const QString &text) = 0;
     virtual void setApplicationProgressRange(int min, int max) = 0;
     virtual void setApplicationProgressValue(int value) = 0;
     virtual void setApplicationProgressVisible(bool visible) = 0;
-
 };
 
 } // namespace Core

@@ -31,8 +31,8 @@
 
 namespace Core {
 
-IPlatformIntegration::IPlatformIntegration(QObject *parent) :
-    QObject(parent)
+IPlatformIntegration::IPlatformIntegration() :
+    ExtensionSystem::IPlugin()
 {
 }
 

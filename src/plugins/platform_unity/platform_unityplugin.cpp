@@ -134,19 +134,35 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
     return true;
 }
 
-/*! Notification that all extensions that this plugin depends on have been
-    initialized. The dependencies are defined in the plugins .pluginspec file.
-
-    Normally this method is used for things that rely on other plugins to have
-    added objects to the plugin manager, that implement interfaces that we're
-    interested in. These objects can now be requested through the
-    PluginManagerInterface.
-
-    The PlatformUnity doesn't need things from other plugins, so it does
-    nothing here.
-*/
 void PlatformUnityPlugin::extensionsInitialized()
 {
+}
+
+void PlatformUnityPlugin::setApplicationLabel(const QString &text)
+{
+    if (qtcreatorEntry && entry_set_count && entry_set_count_visible) {
+        // unity can only handle numbers...
+        int count = text.toInt();
+        entry_set_count(qtcreatorEntry, count);
+        entry_set_count_visible(qtcreatorEntry, count != 0);
+    }
+}
+
+void PlatformUnityPlugin::setApplicationProgressRange(int min, int max)
+{
+    total_progress = max-min;
+}
+
+void PlatformUnityPlugin::setApplicationProgressValue(int value)
+{
+    if (qtcreatorEntry && entry_set_progress)
+        entry_set_progress(qtcreatorEntry, value/(double)total_progress);
+}
+
+void PlatformUnityPlugin::setApplicationProgressVisible(bool visible)
+{
+    if (qtcreatorEntry && entry_set_progress_visible)
+        entry_set_progress_visible(qtcreatorEntry, visible);
 }
 
 } // namespace Internal
