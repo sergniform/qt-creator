@@ -42,6 +42,37 @@
 #include <QAction>
 #include <QMenu>
 
+#include <glib-2.0/glib.h>
+#include <dlfcn.h>
+
+namespace {
+    static const char *QTCREATOR_DESKTOP_FILE = "qt-creator.desktop";
+    int total_progress = 0;
+
+    // Unity data typedefs
+    typedef struct _UnityInspector UnityInspector;
+    typedef UnityInspector* (*unity_inspector_get_default_func)(void);
+    typedef gboolean (*unity_inspector_get_unity_running_func)(UnityInspector* self);
+
+    typedef struct _UnityLauncherEntry UnityLauncherEntry;
+    typedef UnityLauncherEntry* (*unity_launcher_entry_get_for_desktop_id_func)(const gchar* desktop_id);
+    typedef void (*unity_launcher_entry_set_count_func)(UnityLauncherEntry* self, gint64 value);
+    typedef void (*unity_launcher_entry_set_count_visible_func)(UnityLauncherEntry* self, gboolean value);
+    typedef void (*unity_launcher_entry_set_progress_func)(UnityLauncherEntry* self, gdouble value);
+    typedef void (*unity_launcher_entry_set_progress_visible_func)(UnityLauncherEntry* self, gboolean value);
+
+    UnityInspector* inspector = 0;
+    // Reference to panel entry
+    UnityLauncherEntry* qtcreatorEntry = 0;
+
+    // Retrieved functions from libunity to go along with above typedefs
+    unity_inspector_get_unity_running_func get_unity_running = 0;
+    unity_launcher_entry_set_count_func entry_set_count = 0;
+    unity_launcher_entry_set_count_visible_func entry_set_count_visible = 0;
+    unity_launcher_entry_set_progress_func entry_set_progress = 0;
+    unity_launcher_entry_set_progress_visible_func entry_set_progress_visible = 0;
+}
+
 namespace PlatformUnity {
 namespace Internal {
 
@@ -58,38 +89,47 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
     Q_UNUSED(arguments)
     Q_UNUSED(errorMessage)
 
-//    // Create a unique context for our own view, that will be used for the
-//    // menu entry later.
-//    Core::Context context("HelloWorld.MainView");
+    void* unity_lib = dlopen("libunity.so.4", RTLD_LAZY);
+    if (!unity_lib)
+        unity_lib = dlopen("libunity.so.6", RTLD_LAZY);
+    if (!unity_lib)
+        unity_lib = dlopen("libunity.so.9", RTLD_LAZY);
+    if (!unity_lib)
+        return false;
 
-//    // Create an action to be triggered by a menu entry
-//    QAction *helloWorldAction = new QAction(tr("Say \"&Hello World!\""), this);
-//    connect(helloWorldAction, SIGNAL(triggered()), SLOT(sayHelloWorld()));
+    unity_inspector_get_default_func inspector_get_default =
+            reinterpret_cast<unity_inspector_get_default_func>(dlsym(unity_lib, "unity_inspector_get_default"));
 
-//    // Register the action with the action manager
-//    Core::Command *command =
-//            Core::ActionManager::registerAction(
-//                    helloWorldAction, "HelloWorld.HelloWorldAction", context);
+    if (inspector_get_default) {
+        inspector = inspector_get_default();
 
-//    // Create our own menu to place in the Tools menu
-//    Core::ActionContainer *helloWorldMenu =
-//            Core::ActionManager::createMenu("HelloWorld.HelloWorldMenu");
-//    QMenu *menu = helloWorldMenu->menu();
-//    menu->setTitle(tr("&Hello World"));
-//    menu->setEnabled(true);
+        get_unity_running =
+                reinterpret_cast<unity_inspector_get_unity_running_func>(dlsym(unity_lib, "unity_inspector_get_unity_running"));
+    }
 
-//    // Add the Hello World action command to the menu
-//    helloWorldMenu->addAction(command);
+    unity_launcher_entry_get_for_desktop_id_func entry_get_for_desktop_id =
+            reinterpret_cast<unity_launcher_entry_get_for_desktop_id_func>(
+                dlsym(unity_lib, "unity_launcher_entry_get_for_desktop_id"));
 
-//    // Request the Tools menu and add the Hello World menu to it
-//    Core::ActionContainer *toolsMenu =
-//            Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
-//    toolsMenu->addMenu(helloWorldMenu);
+    if (entry_get_for_desktop_id) {
+        qtcreatorEntry = entry_get_for_desktop_id(QTCREATOR_DESKTOP_FILE);
 
-//    // Add a mode with a push button based on BaseMode. Like the BaseView,
-//    // it will unregister itself from the plugin manager when it is deleted.
-//    Core::IMode *helloMode = new HelloMode;
-//    addAutoReleasedObject(helloMode);
+        entry_set_count =
+                reinterpret_cast<unity_launcher_entry_set_count_func>(
+                    dlsym(unity_lib, "unity_launcher_entry_set_count"));
+
+        entry_set_count_visible =
+                reinterpret_cast<unity_launcher_entry_set_count_visible_func>(
+                    dlsym(unity_lib, "unity_launcher_entry_set_count_visible"));
+
+        entry_set_progress =
+                reinterpret_cast<unity_launcher_entry_set_progress_func>(
+                    dlsym(unity_lib, "unity_launcher_entry_set_progress"));
+
+        entry_set_progress_visible =
+                reinterpret_cast<unity_launcher_entry_set_progress_visible_func>(
+                    dlsym(unity_lib, "unity_launcher_entry_set_progress_visible"));
+    }
 
     return true;
 }
