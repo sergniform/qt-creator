@@ -44,6 +44,7 @@
 
 #include <glib-2.0/glib.h>
 #include <dlfcn.h>
+#include <extensionsystem/pluginmanager.h>
 
 namespace {
     static const char *QTCREATOR_DESKTOP_FILE = "qt-creator.desktop";
@@ -78,18 +79,18 @@ namespace Internal {
 
 PlatformUnityPlugin::PlatformUnityPlugin()
 {
+    ExtensionSystem::PluginManager::addObject(this);
 }
 
 PlatformUnityPlugin::~PlatformUnityPlugin()
 {
+    ExtensionSystem::PluginManager::removeObject(this);
 }
 
 bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *errorMessage)
 {
     Q_UNUSED(arguments)
     Q_UNUSED(errorMessage)
-
-    addObject(this);
 
     void* unity_lib = dlopen("libunity.so.4", RTLD_LAZY);
     if (!unity_lib)
