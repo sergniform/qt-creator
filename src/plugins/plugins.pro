@@ -72,7 +72,12 @@ isEmpty(IDE_PACKAGE_MODE) {
         updateinfo
 } else:!isEmpty(UPDATEINFO_ENABLE) {
     SUBDIRS += \
-        updateinfo
+        updateinfo \
+        plugin_updateinfo
+}
+linux-* {
+     SUBDIRS += debugger/ptracepreload.pro
+     SUBDIRS += platform_unity
 }
 
 minQtVersion(5, 2, 0) {

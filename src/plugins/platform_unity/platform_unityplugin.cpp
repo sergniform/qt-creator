@@ -1,0 +1,115 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Daniel Molkentin, Mirko Boehm.
+** Contact: http://www.qt-project.org/legal
+**
+** This file is part of Qt Creator.
+**
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.  For licensing terms and
+** conditions see http://qt.digia.com/licensing.  For further information
+** use the contact form at http://qt.digia.com/contact-us.
+**
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+** In addition, as a special exception, Digia gives you certain additional
+** rights.  These rights are described in the Digia Qt LGPL Exception
+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+**
+****************************************************************************/
+
+#include "platform_unityplugin.h"
+
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/coreconstants.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/imode.h>
+#include <coreplugin/modemanager.h>
+#include <coreplugin/id.h>
+
+#include <QDebug>
+#include <QtPlugin>
+#include <QAction>
+#include <QMenu>
+
+namespace PlatformUnity {
+namespace Internal {
+
+PlatformUnityPlugin::PlatformUnityPlugin()
+{
+}
+
+PlatformUnityPlugin::~PlatformUnityPlugin()
+{
+}
+
+bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *errorMessage)
+{
+    Q_UNUSED(arguments)
+    Q_UNUSED(errorMessage)
+
+//    // Create a unique context for our own view, that will be used for the
+//    // menu entry later.
+//    Core::Context context("HelloWorld.MainView");
+
+//    // Create an action to be triggered by a menu entry
+//    QAction *helloWorldAction = new QAction(tr("Say \"&Hello World!\""), this);
+//    connect(helloWorldAction, SIGNAL(triggered()), SLOT(sayHelloWorld()));
+
+//    // Register the action with the action manager
+//    Core::Command *command =
+//            Core::ActionManager::registerAction(
+//                    helloWorldAction, "HelloWorld.HelloWorldAction", context);
+
+//    // Create our own menu to place in the Tools menu
+//    Core::ActionContainer *helloWorldMenu =
+//            Core::ActionManager::createMenu("HelloWorld.HelloWorldMenu");
+//    QMenu *menu = helloWorldMenu->menu();
+//    menu->setTitle(tr("&Hello World"));
+//    menu->setEnabled(true);
+
+//    // Add the Hello World action command to the menu
+//    helloWorldMenu->addAction(command);
+
+//    // Request the Tools menu and add the Hello World menu to it
+//    Core::ActionContainer *toolsMenu =
+//            Core::ActionManager::actionContainer(Core::Constants::M_TOOLS);
+//    toolsMenu->addMenu(helloWorldMenu);
+
+//    // Add a mode with a push button based on BaseMode. Like the BaseView,
+//    // it will unregister itself from the plugin manager when it is deleted.
+//    Core::IMode *helloMode = new HelloMode;
+//    addAutoReleasedObject(helloMode);
+
+    return true;
+}
+
+/*! Notification that all extensions that this plugin depends on have been
+    initialized. The dependencies are defined in the plugins .pluginspec file.
+
+    Normally this method is used for things that rely on other plugins to have
+    added objects to the plugin manager, that implement interfaces that we're
+    interested in. These objects can now be requested through the
+    PluginManagerInterface.
+
+    The PlatformUnity doesn't need things from other plugins, so it does
+    nothing here.
+*/
+void PlatformUnityPlugin::extensionsInitialized()
+{
+}
+
+} // namespace Internal
+} // namespace HelloWorld
+
+Q_EXPORT_PLUGIN(PlatformUnity::Internal::PlatformUnityPlugin)
