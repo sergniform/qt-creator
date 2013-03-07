@@ -69,6 +69,19 @@
     transfer protocol (SFTP), as specified by the \gui {Upload files via SFTP}
     step.
 
+    If the list of files to be deployed by your project is empty, you need to
+    specify the installation path for your default target and add the default
+    project target to \c INSTALLS:
+
+    \code
+      target.path = /root
+      INSTALLS += target
+    \endcode
+
+    This will deploy the binary of your project to \c /root on the remote device.
+    Additional files can be deployed by adding them to further targets and adding
+    those to \c INSTALLS as well. See the QMake documentation for details.
+
     If you have a lot of data to copy, select \gui Details in the
     \gui {Upload Files via SFTP} step, and then select the
     \gui {Incremental deployment} check box. \QC takes note of the deployment
