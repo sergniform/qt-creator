@@ -27,22 +27,29 @@
 **
 ****************************************************************************/
 
-#include "platform_plasmaplugin.h"
-
 #include <QtPlugin>
 
+#include "platform_plasmaplugin.h"
+
 #include <extensionsystem/pluginmanager.h>
+
+#include <kuiserverjobtracker.h>
+
+#include "BuildJob.h"
 
 namespace PlatformPlasma {
 namespace Internal {
 
 PlatformPlasmaPlugin::PlatformPlasmaPlugin()
+    : m_jobTracker(new KUiServerJobTracker(this))
+    , m_buildJob(0)
 {
     ExtensionSystem::PluginManager::addObject(this);
 }
 
 PlatformPlasmaPlugin::~PlatformPlasmaPlugin()
 {
+    ExtensionSystem::PluginManager::removeObject(this);
 }
 
 bool PlatformPlasmaPlugin::initialize(const QStringList&, QString*)
@@ -52,22 +59,42 @@ bool PlatformPlasmaPlugin::initialize(const QStringList&, QString*)
 
 void PlatformPlasmaPlugin::extensionsInitialized()
 {
+    if (!m_buildJob) return;
+
 }
 
-void PlatformPlasmaPlugin::setApplicationLabel(const QString&)
+void PlatformPlasmaPlugin::setApplicationLabel(const QString& text)
 {
+    if (!m_buildJob) return;
+    m_buildJob->setApplicationLabel(text);
 }
 
-void PlatformPlasmaPlugin::setApplicationProgressRange(int, int)
+void PlatformPlasmaPlugin::setApplicationProgressRange(int min, int max)
 {
+    if (!m_buildJob) return;
+    m_buildJob->setApplicationProgressRange(min, max);
 }
 
-void PlatformPlasmaPlugin::setApplicationProgressValue(int)
+void PlatformPlasmaPlugin::setApplicationProgressValue(int progress)
 {
+    if (!m_buildJob) return;
+    m_buildJob->setApplicationProgressValue(progress);
 }
 
-void PlatformPlasmaPlugin::setApplicationProgressVisible(bool)
+void PlatformPlasmaPlugin::setApplicationProgressVisible(bool visible)
 {
+    if (visible) {
+        if (m_buildJob == 0) {
+            m_buildJob = new BuildJob(this);
+            m_jobTracker->registerJob(m_buildJob);
+        }
+    } else {
+        if (m_buildJob!=0) {
+            m_buildJob->completed();
+            delete m_buildJob;
+            m_buildJob = 0;
+        }
+    }
 }
 
 } // namespace Internal

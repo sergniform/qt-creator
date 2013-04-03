@@ -35,9 +35,13 @@
 
 #include <coreplugin/iplatformintegration.h>
 
+class KUiServerJobTracker;
+
 namespace PlatformPlasma {
 
 namespace Internal {
+
+class BuildJob;
 
 class PlatformPlasmaPlugin : public Core::IPlatformIntegration
 {
@@ -59,6 +63,8 @@ public:
     void setApplicationProgressVisible(bool visible);
 
 private:
+    KUiServerJobTracker* m_jobTracker;
+    BuildJob* m_buildJob;
 };
 
 } // namespace Internal
