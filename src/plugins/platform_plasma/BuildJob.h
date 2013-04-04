@@ -12,6 +12,7 @@ class BuildJob : public KJob
 public:
     explicit BuildJob(QObject *parent = 0);
 
+    void registered();
     void completed();
     void setApplicationProgressRange(int min, int max);
     void setApplicationProgressValue(int progress);

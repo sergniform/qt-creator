@@ -87,6 +87,7 @@ void PlatformPlasmaPlugin::setApplicationProgressVisible(bool visible)
         if (m_buildJob == 0) {
             m_buildJob = new BuildJob(this);
             m_jobTracker->registerJob(m_buildJob);
+            m_buildJob->registered();
         }
     } else {
         if (m_buildJob!=0) {

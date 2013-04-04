@@ -14,6 +14,13 @@ BuildJob::BuildJob(QObject *parent)
 {
 }
 
+void BuildJob::registered()
+{
+    emit description(this, tr("Qt Creator: building..."),
+                     qMakePair(tr("Errors"), tr("0")),
+                     qMakePair(tr("Warnings"), tr("0")));
+}
+
 void BuildJob::completed()
 {
     kill(KJob::EmitResult);
@@ -36,7 +43,7 @@ void BuildJob::setApplicationLabel(const QString &text)
 {
     qDebug() << "BuildJob::setApplicationLabel:" << text;
     if (!text.isEmpty()) {
-        setErrorText(tr("%1 error(s).").arg(text));
+        emit infoMessage(this, tr("%1 error(s).").arg(text));
     }
 }
 
