@@ -14,9 +14,14 @@ BuildJob::BuildJob(QObject *parent)
 {
 }
 
+void BuildJob::setProjectName(const QString &projectName)
+{
+    m_projectName = projectName;
+}
+
 void BuildJob::registered()
 {
-    emit description(this, tr("Qt Creator: building..."),
+    emit description(this, tr("%1: building...").arg(m_projectName),
                      qMakePair(tr("Errors"), tr("0")),
                      qMakePair(tr("Warnings"), tr("0")));
 }

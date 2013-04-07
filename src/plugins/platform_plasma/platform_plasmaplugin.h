@@ -60,7 +60,7 @@ public:
     void setApplicationLabel(const QString &text);
     void setApplicationProgressRange(int min, int max);
     void setApplicationProgressValue(int value);
-    void setApplicationProgressVisible(bool visible);
+    void setApplicationProgressVisible(const QString& projectName, bool visible);
 
 private:
     KUiServerJobTracker* m_jobTracker;

@@ -46,7 +46,7 @@ public:
     virtual void setApplicationLabel(const QString &text) = 0;
     virtual void setApplicationProgressRange(int min, int max) = 0;
     virtual void setApplicationProgressValue(int value) = 0;
-    virtual void setApplicationProgressVisible(bool visible) = 0;
+    virtual void setApplicationProgressVisible(const QString& projectName, bool visible) = 0;
 };
 
 } // namespace Core

@@ -29,6 +29,8 @@
 
 #include <coreplugin/iplatformintegration.h>
 #include <extensionsystem/pluginmanager.h>
+#include <projectexplorer/projectexplorer.h>
+#include <projectexplorer/project.h>
 
 #include "progressmanager_p.h"
 
@@ -67,6 +69,10 @@ void Core::Internal::ProgressManagerPrivate::setApplicationProgressValue(int val
 
 void Core::Internal::ProgressManagerPrivate::setApplicationProgressVisible(bool visible)
 {
+    //ProjectExplorer::Project* project = ProjectExplorer::ProjectExplorerPlugin::instance()->currentProject();
+    ProjectExplorer::Project* project = 0;
+    Q_ASSERT(project);
+    const QString name = project ? project->displayName() : tr("Unknown project");
     foreach(IPlatformIntegration *platform, allPlatformIntegrations())
-        platform->setApplicationProgressVisible(visible);
+        platform->setApplicationProgressVisible(name, visible);
 }

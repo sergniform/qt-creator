@@ -12,6 +12,7 @@ class BuildJob : public KJob
 public:
     explicit BuildJob(QObject *parent = 0);
 
+    void setProjectName(const QString& projectName);
     void registered();
     void completed();
     void setApplicationProgressRange(int min, int max);
@@ -23,6 +24,7 @@ protected:
 private:
     void showPercentage();
     int m_min, m_max, m_progress;
+    QString m_projectName;
 };
 
 } // namespace Internal

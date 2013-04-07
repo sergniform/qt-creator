@@ -74,6 +74,9 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
     if (!m_unityLibHandle)
         return false;
 
+    m_get_unity_running =
+            reinterpret_cast<unity_inspector_get_unity_running_func>(dlsym(m_unityLibHandle, "unity_inspector_get_unity_running"));
+
     unity_inspector_get_default_func inspector_get_default =
             reinterpret_cast<unity_inspector_get_default_func>(dlsym(m_unityLibHandle, "unity_inspector_get_default"));
 
@@ -81,8 +84,12 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
         return false;
 
     m_inspector = inspector_get_default();
-    m_get_unity_running =
-            reinterpret_cast<unity_inspector_get_unity_running_func>(dlsym(m_unityLibHandle, "unity_inspector_get_unity_running"));
+
+    const bool unityRunning = m_get_unity_running(m_inspector);
+    if (!unityRunning) {
+        ExtensionSystem::PluginManager::removeObject(this);
+        return false;
+    }
 
     unity_launcher_entry_get_for_desktop_id_func entry_get_for_desktop_id =
             reinterpret_cast<unity_launcher_entry_get_for_desktop_id_func>(
@@ -136,8 +143,9 @@ void PlatformUnityPlugin::setApplicationProgressValue(int value)
         m_entry_set_progress(m_qtcreatorEntry, value/(double)m_totalProgress);
 }
 
-void PlatformUnityPlugin::setApplicationProgressVisible(bool visible)
+void PlatformUnityPlugin::setApplicationProgressVisible(const QString &projectName, bool visible)
 {
+    Q_UNUSED(projectName);
     if (m_qtcreatorEntry && m_entry_set_progress_visible)
         m_entry_set_progress_visible(m_qtcreatorEntry, visible);
 }

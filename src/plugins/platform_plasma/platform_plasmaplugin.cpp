@@ -81,11 +81,12 @@ void PlatformPlasmaPlugin::setApplicationProgressValue(int progress)
     m_buildJob->setApplicationProgressValue(progress);
 }
 
-void PlatformPlasmaPlugin::setApplicationProgressVisible(bool visible)
+void PlatformPlasmaPlugin::setApplicationProgressVisible(const QString &projectName, bool visible)
 {
     if (visible) {
         if (m_buildJob == 0) {
             m_buildJob = new BuildJob(this);
+            m_buildJob->setProjectName(projectName);
             m_jobTracker->registerJob(m_buildJob);
             m_buildJob->registered();
         }
