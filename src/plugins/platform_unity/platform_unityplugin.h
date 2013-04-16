@@ -70,6 +70,7 @@ public:
     void setApplicationProgressVisible(const QString& projectName, bool visible);
 
 private:
+    bool m_launcherIsRunning;
     void *m_unityLibHandle;
     int m_totalProgress;
     UnityInspector* m_inspector;

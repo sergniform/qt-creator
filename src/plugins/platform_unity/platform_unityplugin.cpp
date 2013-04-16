@@ -30,6 +30,8 @@
 #include "platform_unityplugin.h"
 
 #include <QtPlugin>
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusInterface>
 
 #include <extensionsystem/pluginmanager.h>
 
@@ -41,7 +43,8 @@ namespace PlatformUnity {
 namespace Internal {
 
 PlatformUnityPlugin::PlatformUnityPlugin()
-    : m_unityLibHandle(0)
+    : m_launcherIsRunning(false)
+    , m_unityLibHandle(0)
     , m_totalProgress(0)
     , m_inspector(0)
     , m_qtcreatorEntry(0)
@@ -66,13 +69,23 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
     Q_UNUSED(arguments)
     Q_UNUSED(errorMessage)
 
+    // Before starting, check DBus if the Unity Launcher is registered.
+    QDBusConnection session = QDBusConnection::sessionBus();
+    if (!session.isConnected()) {
+        return true;
+    }
+    QDBusInterface launcher(QLatin1String("com.canonical.Unity"), QLatin1String("/Launcher"));
+    if (!launcher.isValid()) {
+        return true;
+    }
+
     m_unityLibHandle = dlopen("libunity.so.4", RTLD_LAZY);
     if (!m_unityLibHandle)
         m_unityLibHandle = dlopen("libunity.so.6", RTLD_LAZY);
     if (!m_unityLibHandle)
         m_unityLibHandle = dlopen("libunity.so.9", RTLD_LAZY);
     if (!m_unityLibHandle)
-        return false;
+        return true;
 
     m_get_unity_running =
             reinterpret_cast<unity_inspector_get_unity_running_func>(dlsym(m_unityLibHandle, "unity_inspector_get_unity_running"));
@@ -81,39 +94,42 @@ bool PlatformUnityPlugin::initialize(const QStringList &arguments, QString *erro
             reinterpret_cast<unity_inspector_get_default_func>(dlsym(m_unityLibHandle, "unity_inspector_get_default"));
 
     if (!inspector_get_default)
-        return false;
+        return true;
 
     m_inspector = inspector_get_default();
 
     const bool unityRunning = m_get_unity_running(m_inspector);
     if (!unityRunning) {
-        ExtensionSystem::PluginManager::removeObject(this);
-        return false;
+        return true;
     }
 
     unity_launcher_entry_get_for_desktop_id_func entry_get_for_desktop_id =
             reinterpret_cast<unity_launcher_entry_get_for_desktop_id_func>(
                 dlsym(m_unityLibHandle, "unity_launcher_entry_get_for_desktop_id"));
 
-    if (entry_get_for_desktop_id) {
-        m_qtcreatorEntry = entry_get_for_desktop_id(QTCREATOR_DESKTOP_FILE);
-
-        m_entry_set_count =
-                reinterpret_cast<unity_launcher_entry_set_count_func>(
-                    dlsym(m_unityLibHandle, "unity_launcher_entry_set_count"));
-
-        m_entry_set_count_visible =
-                reinterpret_cast<unity_launcher_entry_set_count_visible_func>(
-                    dlsym(m_unityLibHandle, "unity_launcher_entry_set_count_visible"));
-
-        m_entry_set_progress =
-                reinterpret_cast<unity_launcher_entry_set_progress_func>(
-                    dlsym(m_unityLibHandle, "unity_launcher_entry_set_progress"));
-
-        m_entry_set_progress_visible =
-                reinterpret_cast<unity_launcher_entry_set_progress_visible_func>(
-                    dlsym(m_unityLibHandle, "unity_launcher_entry_set_progress_visible"));
+    if (!entry_get_for_desktop_id) {
+        return true;
     }
+
+    m_qtcreatorEntry = entry_get_for_desktop_id(QTCREATOR_DESKTOP_FILE);
+
+    m_entry_set_count =
+            reinterpret_cast<unity_launcher_entry_set_count_func>(
+                dlsym(m_unityLibHandle, "unity_launcher_entry_set_count"));
+
+    m_entry_set_count_visible =
+            reinterpret_cast<unity_launcher_entry_set_count_visible_func>(
+                dlsym(m_unityLibHandle, "unity_launcher_entry_set_count_visible"));
+
+    m_entry_set_progress =
+            reinterpret_cast<unity_launcher_entry_set_progress_func>(
+                dlsym(m_unityLibHandle, "unity_launcher_entry_set_progress"));
+
+    m_entry_set_progress_visible =
+            reinterpret_cast<unity_launcher_entry_set_progress_visible_func>(
+                dlsym(m_unityLibHandle, "unity_launcher_entry_set_progress_visible"));
+
+    m_launcherIsRunning = true;
     Q_ASSERT(m_entry_set_count && m_entry_set_count_visible && m_entry_set_progress && m_entry_set_progress_visible);
     return true;
 }
@@ -124,6 +140,7 @@ void PlatformUnityPlugin::extensionsInitialized()
 
 void PlatformUnityPlugin::setApplicationLabel(const QString &text)
 {
+    if (!m_launcherIsRunning) return;
     if (m_qtcreatorEntry && m_entry_set_count && m_entry_set_count_visible) {
         // unity can only handle numbers...
         int count = text.toInt();
@@ -139,12 +156,14 @@ void PlatformUnityPlugin::setApplicationProgressRange(int min, int max)
 
 void PlatformUnityPlugin::setApplicationProgressValue(int value)
 {
+    if (!m_launcherIsRunning) return;
     if (m_qtcreatorEntry && m_entry_set_progress)
         m_entry_set_progress(m_qtcreatorEntry, value/(double)m_totalProgress);
 }
 
 void PlatformUnityPlugin::setApplicationProgressVisible(const QString &projectName, bool visible)
 {
+    if (!m_launcherIsRunning) return;
     Q_UNUSED(projectName);
     if (m_qtcreatorEntry && m_entry_set_progress_visible)
         m_entry_set_progress_visible(m_qtcreatorEntry, visible);
