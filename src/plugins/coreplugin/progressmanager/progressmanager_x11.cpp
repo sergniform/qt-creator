@@ -71,7 +71,7 @@ void Core::Internal::ProgressManagerPrivate::setApplicationProgressVisible(bool 
 {
     //ProjectExplorer::Project* project = ProjectExplorer::ProjectExplorerPlugin::instance()->currentProject();
     ProjectExplorer::Project* project = 0;
-    Q_ASSERT(project);
+    //Q_ASSERT(project);
     const QString name = project ? project->displayName() : tr("Unknown project");
     foreach(IPlatformIntegration *platform, allPlatformIntegrations())
         platform->setApplicationProgressVisible(name, visible);
