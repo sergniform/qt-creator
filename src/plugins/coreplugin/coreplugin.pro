@@ -195,7 +195,7 @@ HEADERS += mainwindow.h \
     textdocument.h \
     documentmanager.h \
     removefiledialog.h \
-    dialogs/addtovcsdialog.h
+    dialogs/addtovcsdialog.h \
     iplatformintegration.h
 
 FORMS += dialogs/newdialog.ui \
